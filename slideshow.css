@@ -1,0 +1,189 @@
+/*
+ * slideshow.css — styles for slideshow.js
+ * Tweak the custom properties below; override them on .slideshow from your own CSS if you prefer.
+ */
+
+.slideshow {
+	--slideshow-backdrop: rgb(0 0 0 / 0.9);
+	--slideshow-color: #fff;                  /* buttons, caption, counter */
+	--slideshow-gap: 3rem;                    /* space kept around the image */
+	--slideshow-radius: 4px;                  /* image corners */
+	--slideshow-shadow: 0 1rem 3rem rgb(0 0 0 / 0.5);
+	--slideshow-button-size: 3rem;
+	--slideshow-button-bg: rgb(0 0 0 / 0.35);
+	--slideshow-button-bg-hover: rgb(255 255 255 / 0.2);
+	--slideshow-font: 0.95rem/1.4 system-ui, sans-serif;
+	--slideshow-duration: 250ms;              /* open / close / image fade */
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.slideshow { --slideshow-duration: 0s; }
+}
+
+/* ---- Thumbnails on the page ------------------------------------------- */
+
+/* Disabled by the cursorIcons option (which adds .slideshow-no-cursors to <html>). */
+:root:not(.slideshow-no-cursors) :is(:is(a, img)[data-slideshow], [data-slideshow] img) {
+	cursor: zoom-in;
+}
+
+/* ---- The viewer -------------------------------------------------------- */
+
+html:has(.slideshow[open]) {
+	overflow: hidden;
+}
+
+.slideshow {
+	box-sizing: border-box;
+	position: fixed;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	max-height: none;
+	margin: 0;
+	padding: var(--slideshow-gap);
+	border: 0;
+	background: none;
+	color: var(--slideshow-color);
+	font: var(--slideshow-font);
+	touch-action: pan-y pinch-zoom;
+	opacity: 0;
+	transition:
+		opacity var(--slideshow-duration),
+		display var(--slideshow-duration) allow-discrete,
+		overlay var(--slideshow-duration) allow-discrete;
+
+	&[open] {
+		display: grid;
+		place-items: center;
+		opacity: 1;
+
+		@starting-style { opacity: 0; }
+	}
+
+	&::backdrop {
+		background: var(--slideshow-backdrop);
+		opacity: 0;
+		transition:
+			opacity var(--slideshow-duration),
+			display var(--slideshow-duration) allow-discrete,
+			overlay var(--slideshow-duration) allow-discrete;
+	}
+	&[open]::backdrop {
+		opacity: 1;
+
+		@starting-style { opacity: 0; }
+	}
+
+	&:focus { outline: none; }
+}
+
+.slideshow-figure {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.75rem;
+	margin: 0;
+	min-width: 0;
+}
+
+.slideshow-image {
+	display: block;
+	max-width: calc(100vw - 2 * var(--slideshow-gap));
+	max-height: calc(100dvh - 2 * var(--slideshow-gap) - 2.5rem);
+	border-radius: var(--slideshow-radius);
+	box-shadow: var(--slideshow-shadow);
+	animation: slideshow-fade-in var(--slideshow-duration) ease-out;
+
+	&:not([src]) { display: none; }
+}
+
+.slideshow-caption {
+	max-width: 60ch;
+	text-align: center;
+	text-wrap: balance;
+}
+
+.slideshow-counter {
+	position: absolute;
+	top: 1rem;
+	left: 1.25rem;
+	opacity: 0.75;
+	font-variant-numeric: tabular-nums;
+}
+
+/* ---- Buttons ----------------------------------------------------------- */
+
+.slideshow button {
+	position: absolute;
+	display: grid;
+	place-items: center;
+	width: var(--slideshow-button-size);
+	height: var(--slideshow-button-size);
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: var(--slideshow-button-bg);
+	color: inherit;
+	cursor: pointer;
+	transition: background var(--slideshow-duration), opacity var(--slideshow-duration);
+
+	&:hover { background: var(--slideshow-button-bg-hover); }
+	&:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+	&:disabled { opacity: 0.25; cursor: default; background: var(--slideshow-button-bg); }
+	&[hidden] { display: none; }
+
+	svg {
+		width: 55%;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+}
+
+.slideshow.hide-ui :is(button, .slideshow-counter) { display: none; }
+
+.slideshow-close { top: 0.5rem; right: 0.5rem; }
+.slideshow-prev  { left: 0.5rem;  top: 50%; translate: 0 -50%; }
+.slideshow-next  { right: 0.5rem; top: 50%; translate: 0 -50%; }
+
+/* ---- Image-area clicks (imageAreaClick option) ------------------------ */
+
+.slideshow[data-area="prev"] { cursor: w-resize; }
+.slideshow[data-area="next"] { cursor: e-resize; }
+
+/* ---- Loading & errors -------------------------------------------------- */
+
+.slideshow.is-loading::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	width: 2.5rem;
+	height: 2.5rem;
+	margin: auto;
+	border: 3px solid currentColor;
+	border-right-color: transparent;
+	border-radius: 50%;
+	opacity: 0;
+	animation:
+		slideshow-spin 0.8s linear infinite,
+		slideshow-fade-in var(--slideshow-duration) 300ms forwards; /* only show if loading is slow */
+}
+
+.slideshow.is-error .slideshow-image { display: none; }
+.slideshow.is-error .slideshow-figure::before {
+	content: attr(data-error);
+	opacity: 0.75;
+}
+
+@keyframes slideshow-fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes slideshow-spin {
+	to { rotate: 1turn; }
+}

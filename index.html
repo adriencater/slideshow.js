@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Slideshow</title>
+
+	<style>
+		img{ max-width: 100%; object-fit: contain;}
+		div { display: flex; gap: 1rem; margin-bottom: 1rem;}
+		div > * { flex: 1; width: calc((100% - 2rem)/3); }
+	</style>
+
+	<script src="slideshow.js"></script>
+	<link rel="stylesheet" href="slideshow.css">
+	<script>
+		// optional slideshow parameters — all shown with their defaults, delete what you don't change.
+		// Colours, sizes and timing live as CSS custom properties at the top of slideshow.css.
+		Slideshow.configure({
+			loop: true,                  // wrap around from last to first image and back
+			keyboard: true,              // ← → to navigate, Home / End to jump (Esc always closes)
+			swipe: true,                 // swipe left / right on touch screens
+			closeOnBackdropClick: true,  // click outside the image to close
+			imageAreaClick: true,        // click the left / right third of the image for previous / next
+			cursorIcons: true,           // zoom-in cursor on thumbnails, arrow cursors on the image thirds
+			showUI: true,                // buttons and counter (Esc, keys, swipe and clicks still work without)
+			showCaption: true,           // caption = data-caption (on the item or its data-slideshow parent), else link title, else img alt
+			showCounter: true,
+			counterFormat: '{current} / {total}',
+			preload: 1,                  // neighbouring images to fetch ahead, in each direction
+			labels: {
+				dialog: 'Image viewer',
+				close: 'Close',
+				prev: 'Previous image',
+				next: 'Next image',
+				error: 'This image could not be loaded.',
+			},
+			onOpen: null,                // (item, index) => {}
+			onChange: null,              // (item, index) => {}
+			onClose: null,               // () => {}
+		});
+	</script>
+</head>
+<body>
+	
+	<div>
+		<!-- big image -->
+		<a data-slideshow="vacation" href="https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/%281%29Grose_Valley_from_Govetts_Leap-2.jpg/3840px-%281%29Grose_Valley_from_Govetts_Leap-2.jpg">
+			<!-- small image -->
+			<img alt="Is this the Grand Canyon?" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/%281%29Grose_Valley_from_Govetts_Leap-2.jpg/960px-%281%29Grose_Valley_from_Govetts_Leap-2.jpg">
+		</a>
+	
+		<!-- oops, data-slideshow on the img tag -->
+		<a data-caption="A tree." href="https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/1971-12-29_Tanzania_-Serengeti_park_-_Leverworstboom.jpg/1280px-1971-12-29_Tanzania_-Serengeti_park_-_Leverworstboom.jpg">
+			<img data-slideshow="vacation" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/1971-12-29_Tanzania_-Serengeti_park_-_Leverworstboom.jpg/960px-1971-12-29_Tanzania_-Serengeti_park_-_Leverworstboom.jpg">
+		</a>
+
+		<!-- no link, okay. -->
+		<img data-slideshow="vacation" alt="Some people…" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Arizona_Kodacrhome_May_1961_-_mother_father_and_baby.jpg/960px-Arizona_Kodacrhome_May_1961_-_mother_father_and_baby.jpg">
+	
+	</div>
+
+	<!-- what, data-slidehow on the parent?! -->
+	<div data-slideshow="airplanes" data-caption="OMG, Airplanes!">
+		<img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/AN-72_CCCP-19795_at_Paris_Air_Show_1981.jpg/1280px-AN-72_CCCP-19795_at_Paris_Air_Show_1981.jpg">
+		<img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Color_Photographed_B-17E_in_Flight.jpg/1280px-Color_Photographed_B-17E_in_Flight.jpg">
+		<img src="https://upload.wikimedia.org/wikipedia/commons/2/25/Lockheed_12A_Electra_Junior_%2811429468686%29.jpg">
+	</div>
+
+</body>
+</html>

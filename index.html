@@ -6,7 +6,13 @@
 	<title>Slideshow</title>
 
 	<style>
-		img{ max-width: 100%; object-fit: contain;}
+		body { font-family: system-ui; line-height: 1.5; max-width: 60rem; margin: 0 auto; padding: 1rem; }
+		code { font-size: 0.9em; }
+		pre code { font-size: inherit; }
+		pre { font-size: 0.9em; background: #f4f4f4; padding: 0.75rem 1rem; border-radius: 4px; overflow-x: auto; }
+		table { border-collapse: collapse; width: 100%; }
+		th, td { text-align: left; vertical-align: top; padding: 0.35rem 0.75rem 0.35rem 0; border-bottom: 1px solid #ddd; }
+		img{ max-width: 100%; object-fit: contain; }
 		div { display: flex; gap: 1rem; margin-bottom: 1rem;}
 		div > * { flex: 1; width: calc((100% - 2rem)/3); }
 	</style>
@@ -42,7 +48,16 @@
 	</script>
 </head>
 <body>
-	
+
+	<h1>slideshow.js</h1>
+	<p>
+		A tiny lightbox for modern browsers: one script, one stylesheet, no dependencies.
+		Click any image below to try it.
+	</p>
+
+	<h2>Demo</h2>
+
+	<h3>Images in links, one group spread over several elements</h3>
 	<div>
 		<!-- big image -->
 		<a data-slideshow="vacation" href="https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/%281%29Grose_Valley_from_Govetts_Leap-2.jpg/3840px-%281%29Grose_Valley_from_Govetts_Leap-2.jpg">
@@ -60,12 +75,111 @@
 	
 	</div>
 
+	<h3>A whole container as one group</h3>
 	<!-- what, data-slidehow on the parent?! -->
 	<div data-slideshow="airplanes" data-caption="OMG, Airplanes!">
 		<img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/AN-72_CCCP-19795_at_Paris_Air_Show_1981.jpg/1280px-AN-72_CCCP-19795_at_Paris_Air_Show_1981.jpg">
 		<img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Color_Photographed_B-17E_in_Flight.jpg/1280px-Color_Photographed_B-17E_in_Flight.jpg">
 		<img src="https://upload.wikimedia.org/wikipedia/commons/2/25/Lockheed_12A_Electra_Junior_%2811429468686%29.jpg">
 	</div>
+
+	<h2>Setup</h2>
+	<p>Include both files. Nothing else is needed, and the script can go in the <code>&lt;head&gt;</code>.</p>
+<pre><code>&lt;script src="slideshow.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="slideshow.css"&gt;</code></pre>
+
+	<h2>Markup</h2>
+	<p>
+		Add <code>data-slideshow="name"</code> to images. Everything sharing a name becomes one slideshow,
+		in page order, even when spread across the page. The attribute can go in three places:
+	</p>
+<pre><code>&lt;!-- on the link: the thumbnail opens the big image from href --&gt;
+&lt;a data-slideshow="trip" href="big.jpg"&gt;&lt;img src="small.jpg" alt="…"&gt;&lt;/a&gt;
+
+&lt;!-- on the image: uses the surrounding link's href if there is one, otherwise its own src --&gt;
+&lt;img data-slideshow="trip" src="photo.jpg" alt="…"&gt;
+
+&lt;!-- on a parent: every &lt;img&gt; inside joins the slideshow --&gt;
+&lt;section data-slideshow="trip"&gt;
+  &lt;img src="a.jpg" alt="…"&gt;
+  &lt;a href="b-big.jpg"&gt;&lt;img src="b.jpg" alt="…"&gt;&lt;/a&gt;
+&lt;/section&gt;</code></pre>
+	<p>An empty <code>data-slideshow</code> (no name) opens that element on its own: a single image, or just that parent's images.</p>
+
+	<h3>Per-image attributes</h3>
+	<table>
+		<tr><th>Attribute</th><th>Where</th><th>Effect</th></tr>
+		<tr>
+			<td><code>data-caption</code></td>
+			<td><code>&lt;a&gt;</code>, <code>&lt;img&gt;</code> or the <code>data-slideshow</code> parent</td>
+			<td>Caption text. A parent's caption applies to all its images. Without it, the link's <code>title</code> is used, then the image's <code>alt</code>.</td>
+		</tr>
+		<tr>
+			<td><code>data-slideshow-src</code></td>
+			<td><code>&lt;a&gt;</code> or <code>&lt;img&gt;</code></td>
+			<td>URL of the full-size image, for when it isn't the link's <code>href</code> or the image's <code>src</code>.</td>
+		</tr>
+	</table>
+
+	<h2>Options</h2>
+	<p>
+		Call <code>Slideshow.configure({ … })</code> after loading the script, passing only what you want to change.
+		The script tag in this page's <code>&lt;head&gt;</code> lists every option with its default.
+	</p>
+	<table>
+		<tr><th>Option</th><th>Default</th><th>Effect</th></tr>
+		<tr><td><code>loop</code></td><td><code>true</code></td><td>Wrap around from the last image to the first and back.</td></tr>
+		<tr><td><code>keyboard</code></td><td><code>true</code></td><td><kbd>←</kbd> <kbd>→</kbd> to navigate, <kbd>Home</kbd> / <kbd>End</kbd> to jump. <kbd>Esc</kbd> always closes.</td></tr>
+		<tr><td><code>swipe</code></td><td><code>true</code></td><td>Swipe left / right on touch screens.</td></tr>
+		<tr><td><code>closeOnBackdropClick</code></td><td><code>true</code></td><td>Click outside the image to close.</td></tr>
+		<tr><td><code>imageAreaClick</code></td><td><code>true</code></td><td>Click the left / right third of the image for the previous / next image.</td></tr>
+		<tr><td><code>cursorIcons</code></td><td><code>true</code></td><td>Zoom-in cursor on thumbnails, arrow cursors over the image's left / right thirds.</td></tr>
+		<tr><td><code>showUI</code></td><td><code>true</code></td><td>Show the previous / next / close buttons and the counter.</td></tr>
+		<tr><td><code>showCaption</code></td><td><code>true</code></td><td>Show captions.</td></tr>
+		<tr><td><code>showCounter</code></td><td><code>true</code></td><td>Show the image counter.</td></tr>
+		<tr><td><code>counterFormat</code></td><td><code>'{current} / {total}'</code></td><td>Counter text.</td></tr>
+		<tr><td><code>preload</code></td><td><code>1</code></td><td>How many neighbouring images to fetch ahead, in each direction.</td></tr>
+		<tr><td><code>labels</code></td><td>English</td><td>Screen-reader labels (<code>dialog</code>, <code>close</code>, <code>prev</code>, <code>next</code>) and the <code>error</code> message. Pass only the ones to change.</td></tr>
+		<tr><td><code>onOpen</code></td><td><code>null</code></td><td><code>(item, index) =&gt; {}</code> when the slideshow opens.</td></tr>
+		<tr><td><code>onChange</code></td><td><code>null</code></td><td><code>(item, index) =&gt; {}</code> whenever an image is shown.</td></tr>
+		<tr><td><code>onClose</code></td><td><code>null</code></td><td><code>() =&gt; {}</code> when the slideshow closes.</td></tr>
+	</table>
+	<p>Callbacks receive <code>item = { el, src, caption, alt }</code>, where <code>el</code> is the clicked link or image.</p>
+
+	<h2>Styling</h2>
+	<p>
+		Colours, sizes and timing are CSS custom properties at the top of <code>slideshow.css</code>.
+		Edit them there, or override them from your own stylesheet:
+	</p>
+<pre><code>.slideshow {
+  --slideshow-backdrop: rgb(0 0 0 / 0.9);
+  --slideshow-color: #fff;          /* buttons, caption, counter */
+  --slideshow-gap: 3rem;            /* space kept around the image */
+  --slideshow-radius: 4px;          /* image corners */
+  --slideshow-shadow: 0 1rem 3rem rgb(0 0 0 / 0.5);
+  --slideshow-button-size: 3rem;
+  --slideshow-button-bg: rgb(0 0 0 / 0.35);
+  --slideshow-button-bg-hover: rgb(255 255 255 / 0.2);
+  --slideshow-font: 0.95rem/1.4 system-ui, sans-serif;
+  --slideshow-duration: 250ms;      /* open / close / image fade */
+}</code></pre>
+	<p>
+		Animations are turned off automatically for visitors who prefer reduced motion. The viewer's parts have plain class names
+		(<code>.slideshow-image</code>, <code>.slideshow-caption</code>, <code>.slideshow-counter</code>,
+		<code>.slideshow-prev</code>, <code>.slideshow-next</code>, <code>.slideshow-close</code>) for anything further.
+	</p>
+
+	<h2>JavaScript API</h2>
+	<table>
+		<tr><td><code>Slideshow.open(name, index = 0)</code></td><td>Open a slideshow by name, or pass an element instead of a name.</td></tr>
+		<tr><td><code>Slideshow.next()</code>, <code>Slideshow.prev()</code></td><td>Navigate while open.</td></tr>
+		<tr><td><code>Slideshow.close()</code></td><td>Close the slideshow.</td></tr>
+		<tr><td><code>Slideshow.configure(options)</code></td><td>Change options; see above.</td></tr>
+		<tr><td><code>Slideshow.refresh()</code></td><td>
+			Images without a link are made keyboard-focusable (<kbd>Enter</kbd> / <kbd>Space</kbd> opens them) when the page loads.
+			Call this after adding such images to the page later. Clicking works without it.
+		</td></tr>
+	</table>
 
 </body>
 </html>
